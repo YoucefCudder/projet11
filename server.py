@@ -28,16 +28,15 @@ def index():
 
 @app.route('/show_summary', methods=['POST'])
 def show_summary():
-    print(request.form['email'])
     try:
-
         club = [club for club in clubs if club['email'] == request.form['email']][0]
         return render_template('welcome.html', club=club, competitions=competitions)
+
     except Exception:  # type d'erreur ? assertionerror syntaxerror indexerror
         if len(request.form['email']) == 0:
             return f"Please write an email adress."
         else:
-            return f"Sorry, that email wasn\n't found."
+            return f"Sorry, that email wasn\'t found."
 
 
 @app.route('/book/<competition>/<club>')
@@ -53,23 +52,20 @@ def book(competition, club):
 
 @app.route('/purchase_places', methods=['POST'])
 def purchase_places():
-    try:
-        competition = [c for c in competitions if c['name'] == request.form['competition']][0]
-        club = [c for c in clubs if c['name'] == request.form['club']][0]
-        places_required = int(request.form['places'])
-        competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - places_required
-        # erreur 404
-        if club['points'] > competition['numberOfPlaces']:
-            club['points'] = int(club['points']) - places_required #points(pour les clubs) et places(pour les competitions) pareils
+    competition = [c for c in competitions if c['name'] == request.form['competition']][0]
+    club = [c for c in clubs if c['name'] == request.form['club']][0]
+    places_required = int(request.form['places'])
+    competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - places_required
+    club['points'] = int(club['points']) - places_required  # points(pour les clubs) et places(pour les competitions) pareils
+    # erreur 404
+    if club['points'] > competition['numberOfPlaces']:
 
-            flash('Great-booking complete!')
-        elif club['points'] < competition['numberOfPlaces']:
-            flash('Impossible')
+        flash('Great-booking complete!')
+    elif club['points'] < competition['numberOfPlaces']:
 
+        flash(f'error during purchase')
 
         return render_template('welcome.html', club=club, competitions=competitions)
-    except:
-        flash(f'error during purchase')
 
 
 # TODO: Add route for points display
