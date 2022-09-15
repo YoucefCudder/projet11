@@ -58,9 +58,15 @@ def purchase_places():
         club = [c for c in clubs if c['name'] == request.form['club']][0]
         places_required = int(request.form['places'])
         competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - places_required
-        # club['points'] = int(club['points']) - places_required #points(pour les clubs) et places(pour les competitions) pareils
         # erreur 404
-        flash('Great-booking complete!')
+        if club['points'] > competition['numberOfPlaces']:
+            club['points'] = int(club['points']) - places_required #points(pour les clubs) et places(pour les competitions) pareils
+
+            flash('Great-booking complete!')
+        elif club['points'] < competition['numberOfPlaces']:
+            flash('Impossible')
+
+
         return render_template('welcome.html', club=club, competitions=competitions)
     except:
         flash(f'error during purchase')
