@@ -56,8 +56,8 @@ def purchasePlaces():
 # TODO: Add route for points display
 @app.route('/board') #  methods=['GET']   showSummary/board ou board/
 def board():
-    club_infos = [(club['name'], club['points']) for club in clubs if club['email'] != request.form['email']]
-    return render_template('board.html', club=club_infos, competitions=competitions)#enlever competitions
+    club_infos = [(club['name'], club['points']) for club in clubs ]
+    return render_template('board.html', clubs=clubs)
 
 
 @app.route('/logout')
