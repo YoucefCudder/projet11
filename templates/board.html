@@ -5,6 +5,24 @@
     <title>Club's list | GUDLFT</title>
 </head>
 <body>
+  <a href="/">Back to home</a>
 
+    {% with messages = get_flashed_messages()%}
+    {% if messages %}
+    <ul>
+        {% for message in messages %}
+        <li>{{message}}</li>
+        {% endfor %}
+    </ul>
+    {% endif%}
+    <h3>Clubs:</h3>
+    <ul>
+        {% for club in clubs %}
+        <li>
+        </li>
+        {% endfor %}
+    </ul>
+        <hr/>
+    {% endwith %}
 </body>
 </html>
