@@ -49,7 +49,7 @@ def purchasePlaces():
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]
     club = [c for c in clubs if c['name'] == request.form['club']][0]
     places_required = int(request.form['places'])
-    date_competition = competition['date'] #erreur datetime et str, essayer strptime
+    date_competition = datetime.strptime(competition['date'], '%Y-%m-%d %H:%M:%S') 
     date = datetime.today()
 
     try:
