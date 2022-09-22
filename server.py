@@ -49,11 +49,11 @@ def purchasePlaces():
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]
     club = [c for c in clubs if c['name'] == request.form['club']][0]
     places_required = int(request.form['places'])
-    date_competition = datetime.strptime(competition['date'], '%Y-%m-%d %H:%M:%S') 
+    date_competition = datetime.strptime(competition['date'], '%Y-%m-%d %H:%M:%S')
     date = datetime.today()
 
     try:
-        if date > date_competition:
+        if (date > date_competition): #parenthese  + .now : str & int
             raise Exception('Competition already passed, choose a competition still open')
         if club['points'] <= 0:
             raise Exception('not enough points')
