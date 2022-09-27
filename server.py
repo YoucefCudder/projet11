@@ -25,7 +25,7 @@ def index():
     return render_template('index.html')
 
 @app.route('/showSummary',methods=['POST'])
-def showSummary():
+def show_summary():
     club = [club for club in clubs if club['email'] == request.form['email']][0]
     return render_template('welcome.html',club=club,competitions=competitions)
 
@@ -42,14 +42,35 @@ def book(competition,club):
 
 
 @app.route('/purchasePlaces',methods=['POST'])
-def purchasePlaces():
+def purchase_places():
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]
     club = [c for c in clubs if c['name'] == request.form['club']][0]
-    placesRequired = int(request.form['places'])
-    competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
-    flash('Great-booking complete!')
+    places_required = int(request.form['places'])
+
+    try:
+        if club['points'] <= 0:
+            raise Exception('not enough points')
+        if places_required > 12:
+            raise Exception('12 places maximum')
+
+        if places_required > competition['numberOfPlaces']:
+            raise Exception ('not enough places')
+
+
+        competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - places_required
+        club['points'] = int(club['points']) - places_required
+        flash('Great-booking complete!')
+
+    except Exception as error:
+        flash(error)
+
     return render_template('welcome.html', club=club, competitions=competitions)
 
+
+@app.route('/board') #  methods=['GET']   showSummary/board ou board/
+def board():
+    club_infos = [(club['name'], club['points']) for club in clubs ]
+    return render_template('board.html', clubs=clubs)
 
 # TODO: Add route for points display
 
