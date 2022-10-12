@@ -63,11 +63,11 @@ def purchase_places():
         if places_required > 12:
             raise Exception('12 places maximum please')
 
-        if places_required > int(competition['numberOfPlaces']):
+        if places_required  * 3 > int(competition['numberOfPlaces']):
             raise Exception('not enough places')
 
         competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - places_required
-        club['points'] = int(club['points']) - places_required
+        club['points'] = int(club['points']) - (places_required  * 3 )
         flash('Success, booking complete!')
 
     except Exception as error:
