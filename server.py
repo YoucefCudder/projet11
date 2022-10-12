@@ -3,13 +3,13 @@ from flask import Flask, render_template, request, redirect, flash, url_for
 
 
 def load_clubs():
-    with open('Python_testing/clubs.json') as c:
+    with open('clubs.json') as c:
          listOfClubs = json.load(c)['clubs']
          return listOfClubs
 
 
 def load_competitions():
-    with open('Python_testing/competitions.json') as comps:
+    with open('competitions.json') as comps:
          listOfCompetitions = json.load(comps)['competitions']
          return listOfCompetitions
 
@@ -58,17 +58,17 @@ def purchase_places():
     places_required = int(request.form['places'])
 
     try:
-        if club['points'] <= 0:
+        if (int(club['points']) - places_required) <= 0:
             raise Exception('not enough points')
         if places_required > 12:
-            raise Exception('12 places maximum')
+            raise Exception('12 places maximum please')
 
-        if places_required > competition['numberOfPlaces']:
+        if places_required > int(competition['numberOfPlaces']):
             raise Exception('not enough places')
 
         competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - places_required
         club['points'] = int(club['points']) - places_required
-        flash('Great-booking complete!')
+        flash('Success, booking complete!')
 
     except Exception as error:
         flash(error)
