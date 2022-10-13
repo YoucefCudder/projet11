@@ -1,17 +1,19 @@
 import json
+
 from flask import Flask, render_template, request, redirect, flash, url_for
+from datetime import datetime
 
 
 def load_clubs():
     with open('clubs.json') as c:
-         listOfClubs = json.load(c)['clubs']
-         return listOfClubs
+        listOfClubs = json.load(c)['clubs']
+        return listOfClubs
 
 
 def load_competitions():
     with open('competitions.json') as comps:
-         listOfCompetitions = json.load(comps)['competitions']
-         return listOfCompetitions
+        listOfCompetitions = json.load(comps)['competitions']
+        return listOfCompetitions
 
 
 app = Flask(__name__)
@@ -56,18 +58,21 @@ def purchase_places():
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]
     club = [c for c in clubs if c['name'] == request.form['club']][0]
     places_required = int(request.form['places'])
+    date_competition = datetime.strptime(competition['date'], '%Y-%m-%d %H:%M:%S')
+    date = datetime.today()
 
     try:
-        if (int(club['points']) - places_required) <= 0:
-            raise Exception('not enough points')
+        if (date > date_competition):
+            raise Exception('Competition already passed, choose a competition still open')
         if places_required > 12:
             raise Exception('12 places maximum please')
-
-        if places_required  * 3 > int(competition['numberOfPlaces']):
+        if (int(club['points']) - places_required) <= 0:
+            raise Exception('not enough points')
+        if places_required * 3 > int(competition['numberOfPlaces']):
             raise Exception('not enough places')
 
         competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - places_required
-        club['points'] = int(club['points']) - (places_required  * 3 )
+        club['points'] = int(club['points']) - (places_required * 3)
         flash('Success, booking complete!')
 
     except Exception as error:
