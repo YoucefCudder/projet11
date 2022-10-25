@@ -63,9 +63,9 @@ def purchase_places():
             raise Exception('Competition already passed, choose a competition still open')
         if places_required > 12:
             raise Exception('12 places maximum please')
-        if  places_required * 3 > int(club['points']):
+        if places_required * 3 > int(club['points']):
             raise Exception('not enough points')
-        if places_required  > int(competition['numberOfPlaces']):
+        if places_required > int(competition['numberOfPlaces']):
             raise Exception('not enough places')
 
         competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - places_required
