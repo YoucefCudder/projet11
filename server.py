@@ -1,14 +1,15 @@
 import json
 from flask import Flask, render_template, request, redirect, flash, url_for
+from datetime import datetime
 
 
-def loadClubs():
+def load_clubs():
     with open('clubs.json') as c:
         listOfClubs = json.load(c)['clubs']
         return listOfClubs
 
 
-def loadCompetitions():
+def load_competitions():
     with open('competitions.json') as comps:
         listOfCompetitions = json.load(comps)['competitions']
         return listOfCompetitions
@@ -17,8 +18,8 @@ def loadCompetitions():
 app = Flask(__name__)
 app.secret_key = 'something_special'
 
-competitions = loadCompetitions()
-clubs = loadClubs()
+competitions = load_competitions()
+clubs = load_clubs()
 
 
 @app.route('/')
@@ -26,13 +27,12 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/show_summary', methods=['POST'])
+@app.route('/showSummary', methods=['POST'])
 def show_summary():
     try:
         club = [club for club in clubs if club['email'] == request.form['email']][0]
         return render_template('welcome.html', club=club, competitions=competitions)
-
-    except Exception:  # type d'erreur ? assertionerror syntaxerror indexerror
+    except Exception as error:
         if len(request.form['email']) == 0:
             return f"Please write an email adress."
         else:
@@ -50,25 +50,38 @@ def book(competition, club):
         return render_template('welcome.html', club=club, competitions=competitions)
 
 
-@app.route('/purchase_places', methods=['POST'])
+@app.route('/purchasePlaces', methods=['POST'])
 def purchase_places():
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]
     club = [c for c in clubs if c['name'] == request.form['club']][0]
     places_required = int(request.form['places'])
-    competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - places_required
-    club['points'] = int(club['points']) - places_required  # points(pour les clubs) et places(pour les competitions) pareils
-    # erreur 404
-    if club['points'] > competition['numberOfPlaces']:
+    date_competition = datetime.strptime(competition['date'], '%Y-%m-%d %H:%M:%S')
+    date = datetime.today()
 
-        flash('Great-booking complete!')
-    elif club['points'] < competition['numberOfPlaces']:
+    try:
+        if (date > date_competition):
+            raise Exception('Competition already passed, choose a competition still open')
+        if places_required > 12:
+            raise Exception('12 places maximum please')
+        if (int(club['points']) - places_required) <= 0:
+            raise Exception('not enough points')
+        if places_required * 3 > int(competition['numberOfPlaces']):
+            raise Exception('not enough places')
 
-        flash(f'error during purchase')
+        competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - places_required
+        club['points'] = int(club['points']) - (places_required * 3)
+        flash('Success, booking complete!')
 
-        return render_template('welcome.html', club=club, competitions=competitions)
+    except Exception as error:
+        flash(error)
+
+    return render_template('welcome.html', club=club, competitions=competitions)
 
 
-# TODO: Add route for points display
+@app.route('/board')
+def board():
+    club_infos = [(club['name'], club['points']) for club in clubs]
+    return render_template('board.html', clubs=clubs)
 
 
 @app.route('/logout')
