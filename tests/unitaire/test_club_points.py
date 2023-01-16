@@ -6,7 +6,7 @@ class TestEnoughPoints:
         response = client.post("/purchasePlaces", data={
             "club": "Simply Lift",
             "competition": "Fall Classic",
-            "places": "2",
+            "places": "1",
         })
         assert response.status_code == 200
         assert b'Success, booking complete!' in response.data
